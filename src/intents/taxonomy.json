@@ -1,0 +1,46 @@
+{
+  "order_status": {
+    "description": "Customer asks where an order is, its status, ETA, or tracking state.",
+    "examples": ["where is my order", "tracking has not updated"]
+  },
+  "delivery_delay": {
+    "description": "A delivery is late or the customer reports a missed expected delivery date.",
+    "examples": ["my package is late", "delivery was due yesterday"]
+  },
+  "missing_delivery": {
+    "description": "The carrier/order says delivered but the customer did not receive the package.",
+    "examples": ["marked delivered but missing", "I never got my package"]
+  },
+  "refund": {
+    "description": "Customer asks about a refund, refund timing, or a refund that has not appeared.",
+    "examples": ["where is my refund", "refund hasn't arrived"]
+  },
+  "return": {
+    "description": "Customer wants to return an item or asks about the return process/eligibility.",
+    "examples": ["how do I return this", "I need a return label"]
+  },
+  "cancellation": {
+    "description": "Customer wants to cancel an order or asks whether an order can be cancelled.",
+    "examples": ["cancel my order", "can I stop this shipment"]
+  },
+  "payment_issue": {
+    "description": "Payment, charge, card, billing, or checkout problem.",
+    "examples": ["my payment failed", "why was I charged twice"]
+  },
+  "account_issue": {
+    "description": "Login, password, account access, account settings, or identity-related support.",
+    "examples": ["can't log in", "reset my password"]
+  },
+  "subscription_prime": {
+    "description": "Prime membership, Prime renewal, Prime benefits, or Prime billing.",
+    "examples": ["Prime renewed unexpectedly", "Prime benefits aren't working"]
+  },
+  "product_issue": {
+    "description": "Problem with a received product, damaged/wrong item, or product-specific issue.",
+    "examples": ["item arrived damaged", "I received the wrong item"]
+  },
+  "other": {
+    "description": "General help, thanks, unclear messages, or issues that do not fit another intent.",
+    "examples": ["please help", "thanks for the response"]
+  }
+}

@@ -1,0 +1,199 @@
+example_id,message,gold_intent,gold_escalation,label_source
+1,Where is my order?,order_status,AUTO-HANDLE,synthetic_bootstrap
+2,Can you tell me the status of this order?,order_status,AUTO-HANDLE,synthetic_bootstrap
+3,Tracking has not changed.,order_status,AUTO-HANDLE,synthetic_bootstrap
+4,Where is my order? Please help.,order_status,AUTO-HANDLE,synthetic_bootstrap
+5,Can you tell me the status of my order?,order_status,AUTO-HANDLE,synthetic_bootstrap
+6,Tracking has not changed.,order_status,AUTO-HANDLE,synthetic_bootstrap
+7,Where is my order?,order_status,AUTO-HANDLE,synthetic_bootstrap
+8,Can you tell me the status of my order? Please help.,order_status,AUTO-HANDLE,synthetic_bootstrap
+9,Tracking has not changed.,order_status,AUTO-HANDLE,synthetic_bootstrap
+10,Where is this order?,order_status,AUTO-HANDLE,synthetic_bootstrap
+11,Can you tell me the status of my order?,order_status,AUTO-HANDLE,synthetic_bootstrap
+12,Tracking has not changed. Please help.,order_status,AUTO-HANDLE,synthetic_bootstrap
+13,Where is my order?,order_status,AUTO-HANDLE,synthetic_bootstrap
+14,Can you tell me the status of this order?,order_status,AUTO-HANDLE,synthetic_bootstrap
+15,Tracking has not changed.,order_status,AUTO-HANDLE,synthetic_bootstrap
+16,Where is my order? Please help.,order_status,AUTO-HANDLE,synthetic_bootstrap
+17,Can you tell me the status of my order?,order_status,AUTO-HANDLE,synthetic_bootstrap
+18,Tracking has not changed.,order_status,AUTO-HANDLE,synthetic_bootstrap
+19,My delivery is late.,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+20,It was supposed to arrive yesterday.,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+21,Why is my package delayed?,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+22,My delivery is late. Please help.,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+23,It was supposed to arrive yesterday.,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+24,Why is this package delayed?,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+25,My delivery is late.,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+26,It was supposed to arrive yesterday. Please help.,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+27,Why is my package delayed?,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+28,My delivery is late.,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+29,It was supposed to arrive yesterday.,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+30,Why is my package delayed? Please help.,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+31,My delivery is late.,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+32,It was supposed to arrive yesterday.,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+33,Why is my package delayed?,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+34,My delivery is late. Please help.,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+35,It was supposed to arrive yesterday.,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+36,Why is this package delayed?,delivery_delay,AUTO-HANDLE,synthetic_bootstrap
+37,It says delivered but I never got it.,missing_delivery,ESCALATE,synthetic_bootstrap
+38,My package is marked delivered and is missing.,missing_delivery,ESCALATE,synthetic_bootstrap
+39,The carrier says delivered but nothing arrived.,missing_delivery,ESCALATE,synthetic_bootstrap
+40,It says delivered but I never got it. Please help.,missing_delivery,ESCALATE,synthetic_bootstrap
+41,My package is marked delivered and is missing.,missing_delivery,ESCALATE,synthetic_bootstrap
+42,The carrier says delivered but nothing arrived.,missing_delivery,ESCALATE,synthetic_bootstrap
+43,It says delivered but Could you never got it.,missing_delivery,ESCALATE,synthetic_bootstrap
+44,My package is marked delivered and is missing. Please help.,missing_delivery,ESCALATE,synthetic_bootstrap
+45,The carrier says delivered but nothing arrived.,missing_delivery,ESCALATE,synthetic_bootstrap
+46,It says delivered but I never got it.,missing_delivery,ESCALATE,synthetic_bootstrap
+47,My package is marked delivered and is missing.,missing_delivery,ESCALATE,synthetic_bootstrap
+48,The carrier says delivered but nothing arrived. Please help.,missing_delivery,ESCALATE,synthetic_bootstrap
+49,It says delivered but I never got it.,missing_delivery,ESCALATE,synthetic_bootstrap
+50,My package is marked delivered and is missing.,missing_delivery,ESCALATE,synthetic_bootstrap
+51,The carrier says delivered but nothing arrived.,missing_delivery,ESCALATE,synthetic_bootstrap
+52,It says delivered but I never got it. Please help.,missing_delivery,ESCALATE,synthetic_bootstrap
+53,My package is marked delivered and is missing.,missing_delivery,ESCALATE,synthetic_bootstrap
+54,The carrier says delivered but nothing arrived.,missing_delivery,ESCALATE,synthetic_bootstrap
+55,Where is my refund?,refund,AUTO-HANDLE,synthetic_bootstrap
+56,My refund still has not appeared.,refund,AUTO-HANDLE,synthetic_bootstrap
+57,Could you am waiting for the money back.,refund,AUTO-HANDLE,synthetic_bootstrap
+58,Where is my refund? Please help.,refund,AUTO-HANDLE,synthetic_bootstrap
+59,My refund still has not appeared.,refund,AUTO-HANDLE,synthetic_bootstrap
+60,I am waiting for the money back.,refund,AUTO-HANDLE,synthetic_bootstrap
+61,Where is my refund?,refund,AUTO-HANDLE,synthetic_bootstrap
+62,My refund still has not appeared. Please help.,refund,AUTO-HANDLE,synthetic_bootstrap
+63,I am waiting for the money back.,refund,AUTO-HANDLE,synthetic_bootstrap
+64,Where is this refund?,refund,AUTO-HANDLE,synthetic_bootstrap
+65,My refund still has not appeared.,refund,AUTO-HANDLE,synthetic_bootstrap
+66,I am waiting for the money back. Please help.,refund,AUTO-HANDLE,synthetic_bootstrap
+67,Where is my refund?,refund,AUTO-HANDLE,synthetic_bootstrap
+68,My refund still has not appeared.,refund,AUTO-HANDLE,synthetic_bootstrap
+69,Could you am waiting for the money back.,refund,AUTO-HANDLE,synthetic_bootstrap
+70,Where is my refund? Please help.,refund,AUTO-HANDLE,synthetic_bootstrap
+71,My refund still has not appeared.,refund,AUTO-HANDLE,synthetic_bootstrap
+72,I am waiting for the money back.,refund,AUTO-HANDLE,synthetic_bootstrap
+73,How do I return this item?,return,AUTO-HANDLE,synthetic_bootstrap
+74,I need a return label.,return,AUTO-HANDLE,synthetic_bootstrap
+75,Can Could you send this item back?,return,AUTO-HANDLE,synthetic_bootstrap
+76,How do I return this item? Please help.,return,AUTO-HANDLE,synthetic_bootstrap
+77,I need a return label.,return,AUTO-HANDLE,synthetic_bootstrap
+78,Can I send this item back?,return,AUTO-HANDLE,synthetic_bootstrap
+79,How do Could you return this item?,return,AUTO-HANDLE,synthetic_bootstrap
+80,I need a return label. Please help.,return,AUTO-HANDLE,synthetic_bootstrap
+81,Can I send this item back?,return,AUTO-HANDLE,synthetic_bootstrap
+82,How do I return this item?,return,AUTO-HANDLE,synthetic_bootstrap
+83,Could you need a return label.,return,AUTO-HANDLE,synthetic_bootstrap
+84,Can I send this item back? Please help.,return,AUTO-HANDLE,synthetic_bootstrap
+85,How do I return this item?,return,AUTO-HANDLE,synthetic_bootstrap
+86,I need a return label.,return,AUTO-HANDLE,synthetic_bootstrap
+87,Can Could you send this item back?,return,AUTO-HANDLE,synthetic_bootstrap
+88,How do I return this item? Please help.,return,AUTO-HANDLE,synthetic_bootstrap
+89,I need a return label.,return,AUTO-HANDLE,synthetic_bootstrap
+90,Can I send this item back?,return,AUTO-HANDLE,synthetic_bootstrap
+91,Can I cancel my order?,cancellation,AUTO-HANDLE,synthetic_bootstrap
+92,Please cancel this order.,cancellation,AUTO-HANDLE,synthetic_bootstrap
+93,Can this shipment be stopped?,cancellation,AUTO-HANDLE,synthetic_bootstrap
+94,Can I cancel my order? Please help.,cancellation,AUTO-HANDLE,synthetic_bootstrap
+95,Please cancel this order.,cancellation,AUTO-HANDLE,synthetic_bootstrap
+96,Can this shipment be stopped?,cancellation,AUTO-HANDLE,synthetic_bootstrap
+97,Can Could you cancel my order?,cancellation,AUTO-HANDLE,synthetic_bootstrap
+98,Please cancel this order. Please help.,cancellation,AUTO-HANDLE,synthetic_bootstrap
+99,Can this shipment be stopped?,cancellation,AUTO-HANDLE,synthetic_bootstrap
+100,Can I cancel this order?,cancellation,AUTO-HANDLE,synthetic_bootstrap
+101,Please cancel this order.,cancellation,AUTO-HANDLE,synthetic_bootstrap
+102,Can this shipment be stopped? Please help.,cancellation,AUTO-HANDLE,synthetic_bootstrap
+103,Can I cancel my order?,cancellation,AUTO-HANDLE,synthetic_bootstrap
+104,Please cancel this order.,cancellation,AUTO-HANDLE,synthetic_bootstrap
+105,Can this shipment be stopped?,cancellation,AUTO-HANDLE,synthetic_bootstrap
+106,Can I cancel my order? Please help.,cancellation,AUTO-HANDLE,synthetic_bootstrap
+107,Please cancel this order.,cancellation,AUTO-HANDLE,synthetic_bootstrap
+108,Can this shipment be stopped?,cancellation,AUTO-HANDLE,synthetic_bootstrap
+109,My payment failed.,payment_issue,ESCALATE,synthetic_bootstrap
+110,I was charged twice.,payment_issue,ESCALATE,synthetic_bootstrap
+111,Checkout will not accept my card.,payment_issue,ESCALATE,synthetic_bootstrap
+112,My payment failed. Please help.,payment_issue,ESCALATE,synthetic_bootstrap
+113,I was charged twice.,payment_issue,ESCALATE,synthetic_bootstrap
+114,Checkout will not accept this card.,payment_issue,ESCALATE,synthetic_bootstrap
+115,My payment failed.,payment_issue,ESCALATE,synthetic_bootstrap
+116,I was charged twice. Please help.,payment_issue,ESCALATE,synthetic_bootstrap
+117,Checkout will not accept my card.,payment_issue,ESCALATE,synthetic_bootstrap
+118,My payment failed.,payment_issue,ESCALATE,synthetic_bootstrap
+119,Could you was charged twice.,payment_issue,ESCALATE,synthetic_bootstrap
+120,Checkout will not accept my card. Please help.,payment_issue,ESCALATE,synthetic_bootstrap
+121,My payment failed.,payment_issue,ESCALATE,synthetic_bootstrap
+122,I was charged twice.,payment_issue,ESCALATE,synthetic_bootstrap
+123,Checkout will not accept my card.,payment_issue,ESCALATE,synthetic_bootstrap
+124,My payment failed. Please help.,payment_issue,ESCALATE,synthetic_bootstrap
+125,I was charged twice.,payment_issue,ESCALATE,synthetic_bootstrap
+126,Checkout will not accept this card.,payment_issue,ESCALATE,synthetic_bootstrap
+127,I cannot log in.,account_issue,ESCALATE,synthetic_bootstrap
+128,I need to reset this password.,account_issue,ESCALATE,synthetic_bootstrap
+129,Could you cannot access my account.,account_issue,ESCALATE,synthetic_bootstrap
+130,I cannot log in. Please help.,account_issue,ESCALATE,synthetic_bootstrap
+131,I need to reset my password.,account_issue,ESCALATE,synthetic_bootstrap
+132,I cannot access this account.,account_issue,ESCALATE,synthetic_bootstrap
+133,Could you cannot log in.,account_issue,ESCALATE,synthetic_bootstrap
+134,I need to reset my password. Please help.,account_issue,ESCALATE,synthetic_bootstrap
+135,I cannot access my account.,account_issue,ESCALATE,synthetic_bootstrap
+136,I cannot log in.,account_issue,ESCALATE,synthetic_bootstrap
+137,Could you need to reset my password.,account_issue,ESCALATE,synthetic_bootstrap
+138,I cannot access my account. Please help.,account_issue,ESCALATE,synthetic_bootstrap
+139,I cannot log in.,account_issue,ESCALATE,synthetic_bootstrap
+140,I need to reset this password.,account_issue,ESCALATE,synthetic_bootstrap
+141,Could you cannot access my account.,account_issue,ESCALATE,synthetic_bootstrap
+142,I cannot log in. Please help.,account_issue,ESCALATE,synthetic_bootstrap
+143,I need to reset my password.,account_issue,ESCALATE,synthetic_bootstrap
+144,I cannot access this account.,account_issue,ESCALATE,synthetic_bootstrap
+145,My Prime membership renewed.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+146,Prime benefits are not working.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+147,Could you have a question about my Prime charge.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+148,My Prime membership renewed. Please help.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+149,Prime benefits are not working.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+150,I have a question about this Prime charge.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+151,My Prime membership renewed.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+152,Prime benefits are not working. Please help.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+153,I have a question about my Prime charge.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+154,My Prime membership renewed.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+155,Prime benefits are not working.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+156,I have a question about my Prime charge. Please help.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+157,My Prime membership renewed.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+158,Prime benefits are not working.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+159,Could you have a question about my Prime charge.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+160,My Prime membership renewed. Please help.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+161,Prime benefits are not working.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+162,I have a question about this Prime charge.,subscription_prime,AUTO-HANDLE,synthetic_bootstrap
+163,The item arrived damaged.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+164,I received the wrong item.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+165,The product is broken.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+166,The item arrived damaged. Please help.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+167,I received the wrong item.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+168,The product is broken.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+169,The item arrived damaged.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+170,I received the wrong item. Please help.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+171,The product is broken.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+172,The item arrived damaged.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+173,Could you received the wrong item.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+174,The product is broken. Please help.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+175,The item arrived damaged.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+176,I received the wrong item.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+177,The product is broken.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+178,The item arrived damaged. Please help.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+179,I received the wrong item.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+180,The product is broken.,product_issue,AUTO-HANDLE,synthetic_bootstrap
+181,Please help.,other,AUTO-HANDLE,synthetic_bootstrap
+182,I need assistance.,other,AUTO-HANDLE,synthetic_bootstrap
+183,Thanks for your help.,other,AUTO-HANDLE,synthetic_bootstrap
+184,Please help. Please help.,other,AUTO-HANDLE,synthetic_bootstrap
+185,I need assistance.,other,AUTO-HANDLE,synthetic_bootstrap
+186,Thanks for your help.,other,AUTO-HANDLE,synthetic_bootstrap
+187,Please help.,other,AUTO-HANDLE,synthetic_bootstrap
+188,I need assistance. Please help.,other,AUTO-HANDLE,synthetic_bootstrap
+189,Thanks for your help.,other,AUTO-HANDLE,synthetic_bootstrap
+190,Please help.,other,AUTO-HANDLE,synthetic_bootstrap
+191,Could you need assistance.,other,AUTO-HANDLE,synthetic_bootstrap
+192,Thanks for your help. Please help.,other,AUTO-HANDLE,synthetic_bootstrap
+193,Please help.,other,AUTO-HANDLE,synthetic_bootstrap
+194,I need assistance.,other,AUTO-HANDLE,synthetic_bootstrap
+195,Thanks for your help.,other,AUTO-HANDLE,synthetic_bootstrap
+196,Please help. Please help.,other,AUTO-HANDLE,synthetic_bootstrap
+197,I need assistance.,other,AUTO-HANDLE,synthetic_bootstrap
+198,Thanks for your help.,other,AUTO-HANDLE,synthetic_bootstrap

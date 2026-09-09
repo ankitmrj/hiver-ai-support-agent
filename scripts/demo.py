@@ -1,0 +1,22 @@
+from pathlib import Path
+import pandas as pd
+from src.retrieval.tfidf_store import TfidfStore
+
+rows = [
+("1","Where is my order? Tracking hasn't moved.","Your tracking information can take some time to update."),
+("2","My package is marked delivered but I never got it.","Please check around the delivery location and with neighbors."),
+("3","My refund still hasn't appeared.","Refunds can take some time to appear after processing."),
+("4","I need to return this item.","We're happy to help with the return process."),
+("5","Can I cancel my order?","We'll need the order details to determine whether cancellation is still possible."),
+("6","My payment failed at checkout.","Please retry checkout or use another payment method."),
+("7","I cannot log into my account.","Please use the account recovery flow to reset your access."),
+("8","My Prime membership renewed.","I can help explain the membership charge and next steps."),
+("9","The item arrived damaged.","Sorry the item arrived damaged. A replacement or return may be appropriate."),
+("10","Thanks for helping!","You're welcome!"),
+]
+df=pd.DataFrame(rows,columns=["conversation_root_id","customer_text","brand_text"])
+Path("data/demo").mkdir(parents=True,exist_ok=True)
+df.to_csv("data/demo/pairs.csv",index=False)
+store=TfidfStore.fit(df); store.save("data/demo/retrieval.joblib")
+print("Demo index built. Example retrieval:")
+print(store.search("package says delivered but missing",3))
