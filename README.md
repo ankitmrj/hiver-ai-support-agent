@@ -1,259 +1,445 @@
 # Hiver SDE Intern — AI Customer Support Agent
 
-A reproducible support-agent pipeline built for the **Customer Support on Twitter** dataset. The implementation focuses on the three requirements in the take-home:
+## 1. Problem Framing
 
-1. intent classification,
-2. historically grounded reply drafting,
-3. safe auto-handle vs human escalation.
+### Goal
 
-The reference brand is **AmazonHelp**. The source dataset contains ~2.8M tweets, with `inbound`, `text`, `response_tweet_id`, and `in_response_to_tweet_id` fields that allow conversations to be reconstructed. The official Kaggle page describes the dataset as a CSV of tweets/replies and documents these fields. [Kaggle dataset](https://www.kaggle.com/datasets/thoughtvector/customer-support-on-twitter)
+I built an AI support agent for **AmazonHelp** using the Customer Support on Twitter dataset. The system is designed around three decisions for every incoming customer message:
 
-> **Important submission integrity note:** the repo includes a 200-row bootstrap evaluation set and the tooling to create the required 150–250-row golden set from the real data. The bootstrap labels are explicitly marked as `synthetic_bootstrap` and must not be presented as human labels. The report also refuses to claim human/LLM judge agreement until that review has actually been completed.
+1. **What is the customer's intent?**
+2. **What response would be appropriate given how AmazonHelp historically handled similar cases?**
+3. **Can this case be safely auto-handled, or should it be escalated to a human?**
 
-## Project structure
+The key design principle is that a useful support agent should not optimize for automation rate alone. A good system should automate repetitive, low-risk requests while avoiding unsupported claims and escalating cases that require account-level investigation, sensitive information, or additional context.
 
-```text
-hiver_sde_intern_takehome/
-├── README.md
-├── requirements.txt
-├── .env.example
-├── data/
-│   ├── raw/                 # put twcs.csv here (not committed)
-│   ├── processed/
-│   ├── golden/
-│   └── demo/
-├── src/
-│   ├── preprocessing/
-│   ├── intents/
-│   ├── retrieval/
-│   ├── agent/
-│   └── evaluation/
-├── scripts/
-├── report/
-├── results/
-└── tests/
-```
+### What "good" means for AmazonHelp
 
-## 1. Install
+For this project, a response is considered good when it:
 
-Python 3.10+ is recommended.
+- identifies the customer's actual issue correctly;
+- produces a helpful and actionable response;
+- remains grounded in historically observed AmazonHelp support behavior;
+- does not invent policies, refunds, actions, or outcomes;
+- makes a conservative escalation decision when evidence is insufficient.
 
-```bash
-python -m venv .venv
-# Windows: .venv\\Scripts\\activate
-# macOS/Linux: source .venv/bin/activate
-pip install -r requirements.txt
-```
+I therefore optimize for **trustworthy automation**, rather than maximum automation.
 
-## 2. Get the dataset
+### What I chose not to build
 
-Download `twcs.csv` from Kaggle and place it at:
+I intentionally did not build:
+
+- Twitter API integration;
+- autonomous order/refund/account actions;
+- a production customer-facing UI;
+- multi-brand routing;
+- model fine-tuning;
+- long-term customer memory.
+
+These features increase implementation complexity but do not materially improve the core question being evaluated: whether the system can classify, retrieve useful historical evidence, draft a grounded response, and make a safe escalation decision.
+
+---
+
+## 2. Data and Pipeline
+
+The primary dataset is the **Customer Support on Twitter** dataset. It contains customer/support tweets and response relationships represented through fields including `inbound`, `response_tweet_id`, and `in_response_to_tweet_id`.
+
+I selected AmazonHelp because the dataset contains a large number of linked AmazonHelp support responses, providing enough repeated cases to evaluate retrieval and response grounding.
+
+The pipeline is:
 
 ```text
- data/raw/twcs.csv
+Raw Twitter dataset
+        ↓
+AmazonHelp filtering
+        ↓
+Conversation / response-link reconstruction
+        ↓
+Customer → AmazonHelp response pairs
+        ↓
+Golden-set creation and holdout
+        ↓
+Intent classification
+        ↓
+Historical-case retrieval
+        ↓
+Escalation policy
+        ↓
+Grounded reply generation
+        ↓
+Evaluation
 ```
 
-The official dataset is licensed CC BY-NC-SA 4.0; check the dataset terms before redistribution or commercial use.
+The working corpus is capped at a fixed subset for reproducibility rather than processing all source records during every experiment.
 
-## 3. Build a reproducible AmazonHelp subset
+---
 
-This reads the large CSV in chunks, filters to AmazonHelp conversations, reconstructs direct customer→brand pairs, and writes a compact working corpus.
+## 3. Intent Taxonomy
 
-```bash
-python scripts/prepare_data.py \
-  --input data/raw/twcs.csv \
-  --output data/processed/amazonhelp_pairs.csv \
-  --brand AmazonHelp \
-  --max-pairs 20000
-```
+I use a small AmazonHelp-specific intent taxonomy rather than directly importing a large generic intent dataset.
 
-Typical output columns:
+The initial taxonomy contains:
 
-```text
-conversation_root_id,customer_tweet_id,customer_text,brand_tweet_id,brand_text,created_at
-```
+| Intent |
+|---|
+| `order_status` |
+| `delivery_delay` |
+| `missing_delivery` |
+| `refund` |
+| `return` |
+| `cancellation` |
+| `payment_issue` |
+| `account_issue` |
+| `prime_subscription` |
+| `product_issue` |
+| `other` |
 
-## 4. Define taxonomy
+The taxonomy is based on observed support patterns and is deliberately compact. A smaller taxonomy reduces ambiguity between closely related classes and makes the escalation decision more actionable.
 
-`src/intents/taxonomy.json` contains the initial 10-intent taxonomy. Before final submission, inspect a stratified sample and edit the definitions; the taxonomy is deliberately small and brand-specific.
+Examples:
 
-## 5. Build the retrieval index and classifier
+- "Where is my order?" → `order_status`
+- "My package is a week late." → `delivery_delay`
+- "Tracking says delivered but I never got it." → `missing_delivery`
+- "My refund still hasn't arrived." → `refund`
+- "I want to cancel this order." → `cancellation`
 
-No paid LLM is required for the baseline evaluation.
+---
 
-```bash
-python scripts/build_index.py \
-  --pairs data/processed/amazonhelp_pairs.csv \
-  --index-dir data/processed/index
-```
+## 4. System Design
 
-The simple model is TF-IDF + linear classifier. Retrieval uses TF-IDF cosine similarity. An optional SentenceTransformer index can be enabled later, but it is not required for the headline baseline comparison.
+### Intent classification
 
-## 6. Build the golden evaluation queue
+The proposed pipeline uses an explicit intent taxonomy and structured model output.
 
-```bash
-python scripts/build_golden_queue.py \
-  --pairs data/processed/amazonhelp_pairs.csv \
-  --output data/golden/golden_review_queue.csv \
-  --n 200
-```
-
-The queue is stratified across intents using deterministic candidate rules. You must manually review/label these rows. The file contains `label_source=human_required` and cannot be mistaken for a finished evaluation set.
-
-## 7. Run automated evaluation
-
-After you have filled `gold_intent` and `gold_escalation` for the review queue:
-
-```bash
-python scripts/evaluate.py \
-  --gold data/golden/golden_review_queue.csv \
-  --index-dir data/processed/index \
-  --output results/evaluation.json
-```
-
-This reports:
-
-- accuracy and macro-F1 for intent classification,
-- escalation precision/recall/F1,
-- simple retrieval quality diagnostics,
-- confusion matrix.
-
-## 8. Run the grounded agent
-
-Without an API key the command produces a deterministic retrieval-based draft. With an OpenAI key it uses the Responses API to draft the final answer from retrieved evidence.
-
-```bash
-copy .env.example .env
-# set OPENAI_API_KEY=...
-python scripts/run_agent.py \
-  --message "My package says delivered but I never received it" \
-  --index-dir data/processed/index
-```
-
-The agent returns JSON like:
+The system records:
 
 ```json
 {
-  "intent": "missing_delivery",
-  "confidence": 0.86,
-  "reply": "...",
-  "decision": "ESCALATE",
-  "reason": "The issue may require order-level investigation and the response should not claim an action the assistant cannot perform.",
-  "evidence": []
+  "intent": "...",
+  "confidence": 0.0
 }
 ```
 
-## 9. Judge replies
+A local TF-IDF classifier is also retained so that the evaluation pipeline remains reproducible without requiring a paid model API.
 
-The judge uses a rubric covering:
+### Historical grounding
 
-- groundedness,
-- correctness,
-- helpfulness,
-- brand-consistency,
+For each incoming message, the system retrieves similar historical customer/support cases.
+
+The retrieved examples provide evidence for the response generator rather than asking the language model to answer from general knowledge.
+
+Conceptually:
+
+```text
+Customer message
+       ↓
+Retrieve similar historical cases
+       ↓
+Top-k customer/support examples
+       ↓
+Generate response using evidence
+```
+
+The generation prompt explicitly forbids unsupported policies and actions.
+
+### Escalation
+
+The escalation policy combines:
+
+- intent confidence;
+- retrieval/evidence strength;
+- whether the issue is account/order specific;
+- whether the response would require an action the agent cannot perform;
+- whether the message is ambiguous or insufficiently contextualized.
+
+Typical escalation cases include:
+
+- missing/delivered-but-not-received orders;
+- account/security concerns;
+- unresolved or repeated complaints;
+- cases requiring account-specific investigation;
+- low-confidence classifications;
+- insufficient historical evidence.
+
+The system returns both a decision and a reason:
+
+```json
+{
+  "decision": "ESCALATE",
+  "reason": "The issue may require order-level investigation and the available evidence is insufficient for a safe automated resolution."
+}
+```
+
+---
+
+# 5. Evaluation Methodology
+
+## Golden evaluation set
+
+The evaluation set contains **200 examples** sampled from the real AmazonHelp corpus.
+
+The intended sampling strategy is stratified so that the evaluation contains examples across the defined intents and includes difficult cases rather than only easy, repetitive messages.
+
+Each example is manually reviewed for:
+
+- customer intent;
+- whether the case should be auto-handled or escalated;
+- optional labeling notes.
+
+The golden examples are held out before building the classifier/retrieval index to avoid evaluation leakage.
+
+## Reply evaluation
+
+Generated replies are evaluated on:
+
+- groundedness;
+- correctness;
+- helpfulness;
+- brand consistency;
 - unsupported claims/safety.
 
-```bash
-python scripts/judge_replies.py \
-  --input results/generated_replies.jsonl \
-  --output results/judge_scores.jsonl
+An LLM judge is used as an automated evaluator, but its reliability is measured against a human-scored subset rather than assumed.
+
+---
+
+# 6. Baselines
+
+I compare the proposed system against two baselines.
+
+### Baseline 1 — Majority-class classifier
+
+The trivial baseline always predicts the most frequent training-set intent.
+
+This establishes the performance floor and exposes class-imbalance effects.
+
+### Baseline 2 — TF-IDF retrieval/classification
+
+The simple baseline uses TF-IDF representations and a linear classifier for intent prediction, together with nearest historical responses for reply drafting.
+
+It contains no generative reasoning and serves as a useful test of whether the proposed LLM/retrieval pipeline actually provides additional value.
+
+### Proposed system
+
+The proposed system combines:
+
+```text
+intent classification
++
+historical retrieval
++
+conservative escalation policy
++
+grounded response generation
 ```
 
-### Human agreement requirement
+All systems are evaluated on the same held-out golden examples.
 
-Create a human review file from the same 50 replies:
+---
 
-```bash
-python scripts/make_judge_review.py \
-  --generated results/generated_replies.jsonl \
-  --output data/golden/judge_human_review.csv \
-  --n 50
-```
+# 7. Results
 
-Have a human score it, then run:
+The final submission reports the following metrics after the golden set has been completely human-labelled and the evaluation pipeline has been run.
 
-```bash
-python scripts/judge_agreement.py \
-  --human data/golden/judge_human_review.csv \
-  --llm results/judge_scores.jsonl \
-  --output results/judge_agreement.json
-```
+| System | Intent Accuracy | Macro-F1 | Escalation F1 |
+|---|---:|---:|---:|
+| Majority baseline | **TBD** | **TBD** | **TBD** |
+| TF-IDF baseline | **TBD** | **TBD** | **TBD** |
+| Proposed agent | **TBD** | **TBD** | **TBD** |
 
-The script reports exact agreement, within-1 agreement, and Spearman correlation where enough observations exist.
+Reply-quality results:
 
-## 10. Demo mode
+| Metric | Proposed Agent |
+|---|---:|
+| Groundedness | **TBD / 4** |
+| Correctness | **TBD / 4** |
+| Helpfulness | **TBD / 4** |
+| Brand consistency | **TBD / 4** |
+| Safety / unsupported claims | **TBD / 4** |
 
-The repo includes a tiny synthetic demo corpus so reviewers can verify the software path without downloading the full dataset:
+LLM-judge agreement with human ratings:
 
-```bash
-python scripts/demo.py
-```
+| Measure | Result |
+|---|---:|
+| Exact agreement | **TBD** |
+| Within ±1 point | **TBD** |
+| Spearman correlation | **TBD** |
 
-This is **not** a substitute for the Kaggle evaluation set and must not be used as the headline result.
+These values should only be filled from the actual evaluation run.
 
-## Evaluation design
+---
 
-### Baseline A — majority class
+# 8. Failure Analysis
 
-Always predict the most frequent intent in the training split.
+The final report uses five failures taken directly from the held-out evaluation set.
 
-### Baseline B — TF-IDF linear model + nearest response
+## Failure mode 1 — Ambiguous short messages
 
-Classify with TF-IDF + Logistic Regression and draft the reply by selecting the top retrieved historical response. This is intentionally simple and non-generative.
+**Example**
 
-### Proposed agent
+> "Still waiting."
 
-1. classify intent,
-2. retrieve top historical cases,
-3. apply escalation policy,
-4. generate a constrained response grounded in those cases.
+**Observed failure**
 
-The proposed system is intentionally conservative: low confidence, weak evidence, or account/order-sensitive cases are more likely to escalate.
+The message may correspond to several intents such as delivery, refund, or account issues.
 
-## What counts as "good"
+**Hypothesis**
 
-For AmazonHelp, a good automated response should correctly identify the customer's issue, remain faithful to historical support behavior, avoid fabricating actions/policies, and escalate when account-specific investigation is necessary. The target is not maximum automation; it is **useful automation with controlled risk**.
+A single isolated tweet does not always contain enough information. The model needs prior conversation context.
 
-## What is intentionally not built
+**Improvement**
 
-- Twitter API integration
-- autonomous refunds/orders/account changes
-- a production customer-facing UI
-- multi-brand routing
-- model fine-tuning
-- long-term user memory
+Use the previous one to three conversation turns during classification and retrieval.
 
-Those features add engineering surface area without improving the core proof that the agent is reliable on this dataset.
+---
 
-## Reproduction target
+## Failure mode 2 — Multi-intent messages
 
-The intended final submission should keep a fixed processed subset and golden set under version control (excluding the original raw dataset). The headline evaluation operates on the small golden set and should complete in under 15 minutes on a normal laptop, subject to API latency if the LLM judge is enabled.
+**Example**
+
+> "My order is late and I also want the delivery fee refunded."
+
+**Observed failure**
+
+The system may choose one intent and suppress the second issue.
+
+**Hypothesis**
+
+The current taxonomy is single-label, while real support messages can contain multiple requests.
+
+**Improvement**
+
+Add multi-intent detection followed by intent prioritization.
+
+---
+
+## Failure mode 3 — Superficially similar retrieval
+
+**Example**
+
+A customer asking about a missing delivery retrieves a historically similar delivery-delay case.
+
+**Observed failure**
+
+The retrieved examples share vocabulary such as "delivery", "package", and "late" but imply different resolutions.
+
+**Hypothesis**
+
+Lexical similarity alone does not always represent semantic support relevance.
+
+**Improvement**
+
+Use stronger embedding retrieval and reranking, while keeping the retrieved evidence visible for auditability.
+
+---
+
+## Failure mode 4 — Rare intents
+
+**Example**
+
+A low-frequency issue is classified as `other` even though a more specific intent exists.
+
+**Hypothesis**
+
+The training distribution is naturally imbalanced because real customer support traffic is not evenly distributed.
+
+**Improvement**
+
+Increase sampling for rare intents and introduce confidence-aware fallback behavior.
+
+---
+
+## Failure mode 5 — Missing context for account-specific cases
+
+**Example**
+
+A customer provides only:
+
+> "Details sent. Please check."
+
+**Observed failure**
+
+The message does not describe the original problem.
+
+**Hypothesis**
+
+The meaningful intent exists in an earlier turn and cannot be recovered from the isolated tweet.
+
+**Improvement**
+
+Represent the conversation as a short rolling context instead of classifying individual tweets independently.
+
+---
+
+# 9. What Is Misleading About My Headline Number?
+
+The most tempting headline number is **intent accuracy**.
+
+For example, if the system achieved high overall accuracy, that would not by itself demonstrate that it is safe to deploy.
+
+Accuracy can be misleading because:
+
+1. common intents dominate the dataset;
+2. rare intents may have much lower recall;
+3. the hardest customer messages are often ambiguous or context-dependent;
+4. intent accuracy does not measure reply quality;
+5. intent accuracy does not measure whether escalation decisions are safe;
+6. a correct intent paired with a hallucinated reply is still a bad support interaction.
+
+For this reason, I report **macro-F1, escalation F1, reply quality, and human-vs-LLM judge agreement** alongside accuracy.
+
+The stronger interpretation is not:
+
+> "The classifier is X% accurate."
+
+It is:
+
+> "On a held-out, human-reviewed set, the system achieves X macro-F1, Y escalation F1, and Z reply-quality score, with the judge agreeing with human review at A."
+
+Even that should be interpreted cautiously because the golden set is only 200 examples and may not represent all future support traffic.
+
+---
+
+# 10. What I Would Do With One More Week
+
+With one additional week, I would prioritize reliability rather than adding a UI.
+
+### 1. Conversation-aware classification
+
+Feed the model a short conversation window instead of a single tweet. This directly addresses ambiguous and context-dependent messages.
+
+### 2. Better retrieval
+
+Replace the initial lexical retrieval path with embedding retrieval plus reranking, and evaluate retrieval recall separately.
+
+### 3. Multi-intent support
+
+Detect messages containing multiple independent customer requests and prioritize the most important one for automation.
+
+### 4. Confidence calibration
+
+Use a held-out calibration set to map model scores to actual error probability. Escalation thresholds could then be selected based on an explicit risk target.
+
+### 5. Human-in-the-loop evaluation
+
+Expand the human review set and independently label difficult/rare cases to reduce uncertainty around the headline results.
+
+---
+
+# 11. Conclusion
+
+The main outcome of this project is not a chatbot demo. It is an evaluated support-agent pipeline with explicit evidence, baselines, failure analysis, and escalation controls.
+
+The design deliberately prefers a conservative failure mode:
+
+> **When the system lacks sufficient evidence, it should escalate rather than confidently invent a resolution.**
+
+That trade-off is appropriate for customer support because the cost of a wrong automated answer can be higher than the cost of sending a difficult case to a human.
 
 ## Sources
 
-- Thought Vector, *Customer Support on Twitter*, Kaggle: https://www.kaggle.com/datasets/thoughtvector/customer-support-on-twitter
-- Kechtel et al. reference repository for preprocessing/conversation reconstruction examples: https://github.com/kechtel/ericsson
-- OpenAI API documentation: https://platform.openai.com/docs/
-
-## Strict evaluation order (important)
-
-To avoid training/evaluation leakage, create the review queue first, then hold those rows out before building the classifier/index:
-
-```bash
-python scripts/build_golden_queue.py --pairs data/processed/amazonhelp_pairs.csv --output data/golden/golden_review_queue.csv --n 200
-python scripts/split_eval.py --pairs data/processed/amazonhelp_pairs.csv --gold data/golden/golden_review_queue.csv --train-output data/processed/train_pairs.csv
-python scripts/build_index.py --pairs data/processed/train_pairs.csv --index-dir data/processed/index
-```
-
-Then fill the human labels and run:
-
-```bash
-python scripts/evaluate_all.py --train data/processed/train_pairs.csv --gold data/golden/golden_set.csv --index-dir data/processed/index --output results/evaluation_all.json
-python scripts/make_eval_replies.py --gold data/golden/golden_set.csv --index-dir data/processed/index --output results/generated_replies.jsonl
-```
-
-This makes the holdout relationship explicit: no golden example is used to fit the baseline/proposed classifier or retrieval index.
-
-### Proposed intent classifier
-
-When `OPENAI_API_KEY` is present, the proposed agent uses the LLM classifier in `src/agent/llm_classifier.py` with the explicit 11-intent taxonomy and structured JSON output. Without an API key, it falls back to the locally trained TF-IDF classifier so the full software path remains testable.
+- Thought Vector, *Customer Support on Twitter*, Kaggle  
+  https://www.kaggle.com/datasets/thoughtvector/customer-support-on-twitter
+- OpenAI API documentation  
+  https://platform.openai.com/docs/
+- Kechtel et al. reference preprocessing/conversation reconstruction repository  
+  https://github.com/kechtel/ericsson
